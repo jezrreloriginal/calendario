@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações de Horários</title>
+    <style>
+        /* Adicione o mesmo estilo do index.html ou personalize conforme necessário */
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Configuração de Horários</h1>
+</header>
+
+<div>
+    <input type="date" id="configDate">
+    <input type="time" id="configTime">
+    <button onclick="addAvailableTime()">Adicionar Horário</button>
+    <button onclick="removeTime()">Remover Horário</button>
+    <button onclick="closeSettings()">Voltar</button>
+</div>
+
+<div id="scheduledTimes">
+    <h3>Horários Configurados:</h3>
+    <ul id="timesList"></ul>
+</div>
+
+<script>
+    const scheduledTimes = {};
+
+    // Função para adicionar horário
+    function addAvailableTime() {
+        const date = document.getElementById('configDate').value;
+        const time = document.getElementById('configTime').value;
+        
+        if (!date || !time) {
+            alert('Por favor, insira uma data e hora válidas.');
+            return;
+        }
+
+        if (!scheduledTimes[date]) {
+            scheduledTimes[date] = [];
+        }
+
+        scheduledTimes[date].push(time);
+        updateScheduledTimes();
+    }
+
+    // Função para remover horário
+    function removeTime() {
+        const date = document.getElementById('configDate').value;
+        const time = document.getElementById('configTime').value;
+
+        if (!date || !time) {
+            alert('Por favor, insira uma data e hora válidas.');
+            return;
+        }
+
+        const index = scheduledTimes[date]?.indexOf(time);
+        if (index > -1) {
+            scheduledTimes[date].splice(index, 1);
+            updateScheduledTimes();
+        }
+    }
+
+    // Função para atualizar a lista de horários configurados
+    function updateScheduledTimes() {
+        const timesList = document.getElementById('timesList');
+        timesList.innerHTML = '';
+
+        for (const date in scheduledTimes) {
+            scheduledTimes[date].forEach(time => {
+                const li = document.createElement('li');
+                li.textContent = `Data: ${date}, Hora: ${time}`;
+                timesList.appendChild(li);
+            });
+        }
+    }
+
+    // Função para voltar para a página principal
+    function closeSettings() {
+        window.location.href = 'index.html';
+    }
+
+    updateScheduledTimes();
+</script>
+
+</body>
+</html>
