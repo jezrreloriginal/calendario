@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartomante Sensitiva - Agendamentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        header {
+            background-color: #4b0082;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .calendar div {
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f8f8f8;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .calendar div:hover {
+            background-color: #ddd;
+        }
+
+        .calendar .selected {
+            background-color: #4b0082;
+            color: #fff;
+        }
+
+        .appointments {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .appointments button {
+            padding: 10px 20px;
+            background-color: #4b0082;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .appointments button:hover {
+            background-color: #6a2a91;
+        }
+
+        .appointment-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #4b0082;
+            color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointment-form input,
+        .appointment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .appointment-form button {
+            background-color: #fdd835;
+            color: #4b0082;
+            cursor: pointer;
+        }
+
+        .settings {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .settings button {
+            padding: 10px 20px;
+            background-color: #fdd835;
+            color: #4b0082;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .settings button:hover {
+            background-color: #6a2a91;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Cartomante Sensitiva - Agendamentos</h1>
+</header>
+
+<div class="calendar" id="calendar"></div>
+
+<div class="appointments">
+    <h3>Horários disponíveis para o dia:</h3>
+    <div id="availableTimes"></div>
+    <div class="appointment-form" id="appointmentForm">
+        <h3>Preencha seus dados para agendar:</h3>
+        <form id="form">
+            <input type="text" id="name" placeholder="Nome" required>
+            <input type="text" id="phone" placeholder="Celular" required>
+            <textarea id="message" placeholder="Mensagem (opcional)"></textarea>
+            <button type="button" onclick="submitAppointment()">Confirmar Agendamento</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let selectedDay = null;
+    let availableTimes = {};
+
+    // Função para gerar o calendário
+    function generateCalendar(monthOffset = 0) {
+        const calendarElement = document.getElementById('calendar');
+        const currentDate = new Date();
+        currentDate.setMonth(currentDate.getMonth() + monthOffset);
+
+        const month = currentDate.getMonth();
+        const year = currentDate.getFullYear();
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        const firstDay = firstDayOfMonth.getDay();
+
+        calendarElement.innerHTML = '';
+
+        // Preencher os dias do calendário
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDay = document.createElement('div');
+            calendarElement.appendChild(emptyDay);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.textContent = day;
+            dayElement.addEventListener('click', () => openDayModal(day));
+            calendarElement.appendChild(dayElement);
+        }
+    }
+
+    // Abrir as opções de horários ao clicar no dia
+    function openDayModal(day) {
+        selectedDay = day;
+        const availableTimesDiv = document.getElementById('availableTimes');
+        const appointmentForm = document.getElementById('appointmentForm');
+
+        availableTimesDiv.innerHTML = '';
+        const times = availableTimes[selectedDay] || [];
+
+        if (times.length === 0) {
+            availableTimesDiv.innerHTML = '<p>Dia sem horários disponíveis.</p>';
+        } else {
+            times.forEach(time => {
+                const timeDiv = document.createElement('div');
+                timeDiv.textContent = time;
+                timeDiv.addEventListener('click', () => showAppointmentForm(time));
+                availableTimesDiv.appendChild(timeDiv);
+            });
+        }
+
+        appointmentForm.style.display = 'block';
+    }
+
+    // Exibir o formulário para agendar
+    function showAppointmentForm(time) {
+        document.getElementById('appointmentForm').innerHTML = `
+            <h3>Agendar para o dia ${selectedDay} às ${time}</h3>
+            <form id="form">
+                <input type="text" id="name" placeholder="Nome" required>
+                <input type="text" id="phone" placeholder="Celular" required>
+                <textarea id="message" placeholder="Mensagem (opcional)"></textarea>
+                <button type="button" onclick="submitAppointment('${time}')">Confirmar Agendamento</button>
+            </form>
+        `;
+    }
+
+    // Função para confirmar agendamento
+    function submitAppointment(time) {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const message = document.getElementById('message').value;
+
+        alert(`Agendamento confirmado para o dia ${selectedDay} às ${time}.`);
+
+        document.getElementById('appointmentForm').style.display = 'none';
+
+        // Limpar campos do formulário
+        document.getElementById('name').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('message').value = '';
+    }
+
+    // Função para abrir configurações de horários
+    function openSettings() {
+        window.location.href = 'agenda.html';
+    }
+
+    generateCalendar();
+</script>
+
+</body>
+</html>
