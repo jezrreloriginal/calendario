@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas Agendadas - Cartomante Sensitiva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2e003e;
+            color: #f8e1ff;
+        }
+
+        header {
+            background-color: #4b0082;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #fdd835;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #f8e1ff;
+        }
+
+        .btn {
+            background-color: #fdd835;
+            color: #4b0082;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        footer {
+            background-color: #2e003e;
+            color: #f8e1ff;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        footer a {
+            color: #fdd835;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Consultas Agendadas</h1>
+    </header>
+
+    <nav>
+        <a href="index.html">Agendar Nova Consulta</a>
+    </nav>
+
+    <section class="section">
+        <h3>Lista de Agendamentos</h3>
+        <table id="appointmentsTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="appointmentsList">
+                <!-- Agendamentos serão inseridos aqui dinamicamente -->
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Cartomante Sensitiva | <a href="mailto:contato@cartomantesensitiva.com">Contato</a></p>
+    </footer>
+
+    <script>
+        // Carregar os agendamentos armazenados no localStorage
+        window.onload = function() {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            const appointmentsList = document.getElementById('appointmentsList');
+
+            appointments.forEach((appointment, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${appointment.name}</td>
+                    <td>${appointment.phone}</td>
+                    <td>${appointment.appointmentDate}</td>
+                    <td>${appointment.appointmentTime}</td>
+                    <td><button class="btn" onclick="deleteAppointment(${index})">Excluir</button></td>
+                `;
+                appointmentsList.appendChild(row);
+            });
+        };
+
+        // Excluir agendamento
+        function deleteAppointment(index) {
+            const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+            appointments.splice(index, 1); // Remove o agendamento da lista
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+
+            // Atualiza a tabela
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
